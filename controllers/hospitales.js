@@ -37,19 +37,69 @@ const crearHospital = async (req, res = response) => {
 }
 
 const actualizarHospital = async (req, res = response) => {
+    const id = req.params.id;
+    const uid = req.uid;
     
-    res.json({
-        ok: true,
-        msg: 'actualizarHospital'
-    })
+    try {
+        const hospital = await Hospital.findById( id );
+        if( !hospital ){
+            return res.status(404).json({
+                ok: true,
+                msg: 'Hospital no encontrado por id',
+            });
+        }
+        // actualizar solo un campo (solo nombre)
+        /**hospital.nombre = req.body.nombre;*/
+
+        // funcion para actualizar varios campos
+        const cambiosHospital = {
+            ...req.body,             //todo lo que viene en el body para ser actualizado
+            usuario: uid,            // añadimos al usuario que es requerido (es porque pasamos por JWT del usuario)
+        }
+        //actualizamos -->
+        const hospitalActualizado = await Hospital.findByIdAndUpdate( id, cambiosHospital, { new: true });
+
+        res.json({
+            ok: true,
+            msg: 'actualizarHospital',
+            hospital: hospitalActualizado
+        })
+        
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'hable con el administrador'
+        })
+    }
 }
 
 const borrarHospital = async (req, res = response) => {
+    const id = req.params.id;
     
-    res.json({
-        ok: true,
-        msg: 'borrarHospital'
-    })
+    try {
+        const hospital = await Hospital.findById( id );
+        if( !hospital ){
+            return res.status(404).json({
+                ok: true,
+                msg: 'Hospital no encontrado por id',
+            });
+        }
+    
+        await Hospital.findByIdAndDelete( id );
+
+        res.json({
+            ok: true,
+            msg: 'Hospital eliminado'
+        })
+        
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'hable con el administrador'
+        })
+    }
 }
 
 module.exports = {

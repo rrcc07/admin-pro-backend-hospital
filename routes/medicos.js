@@ -26,10 +26,13 @@ router.post('/',
 router.put('/:id',
     [
     // inplementar middleware (para las validaciones (usando express-validators))
-
+        validarJWT,
+        check('nombre', 'el nombre del medico es necesario').not().isEmpty(),
+        check('hospital', 'el id del hospital debe ser valido').isMongoId(),
+        validarCampos
     ], actualizarMedico
-);
-
-router.delete('/:id', borrarMedico )
+    );
+    
+router.delete('/:id', validarJWT, borrarMedico )
 
 module.exports = router;

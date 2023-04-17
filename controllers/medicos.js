@@ -38,18 +38,69 @@ const crearMedico = async (req, res = response) => {
 
 const actualizarMedico = async (req, res = response) => {
     
-    res.json({
-        ok: true,
-        msg: 'actualizarHospital'
-    })
+    const id = req.params.id;
+    const uid = req.uid;
+    
+    try {
+        const medico = await Medico.findById( id );
+        if( !medico ){
+            return res.status(404).json({
+                ok: true,
+                msg: 'Medico no encontrado por id',
+            });
+        }
+ 
+        // funcion para actualizar varios campos
+        const cambiosMedico = {
+            ...req.body,             //todo lo que viene en el body para ser actualizado
+            usuario: uid,          // añadimos al usuario que es requerido (es porque pasamos por JWT del usuario)
+        }
+        //actualizamos -->
+        const medicoActualizado = await Medico.findByIdAndUpdate( id, cambiosMedico, { new: true });
+
+        res.json({
+            ok: true,
+            msg: 'actualizarMedico',
+            medico: medicoActualizado
+        })
+        
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'hable con el administrador'
+        })
+    }
+    
 }
 
 const borrarMedico = async (req, res = response) => {
     
-    res.json({
-        ok: true,
-        msg: 'borrarMedico'
-    })
+    const id = req.params.id;
+    
+    try {
+        const medico = await Medico.findById( id );
+        if( !medico ){
+            return res.status(404).json({
+                ok: true,
+                msg: 'Medico no encontrado por id',
+            });
+        }
+    
+        await Medico.findByIdAndDelete( id );
+
+        res.json({
+            ok: true,
+            msg: 'Medico eliminado'
+        })
+        
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            msg: 'hable con el administrador'
+        })
+    }
 }
 
 module.exports = {

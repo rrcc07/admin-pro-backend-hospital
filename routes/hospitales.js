@@ -24,11 +24,13 @@ router.post('/',
 
 router.put('/:id',
     [
-    // inplementar middleware (para las validaciones (usando express-validators))
-
+        // inplementar middleware (para las validaciones (usando express-validators))
+        validarJWT,
+        check('nombre', 'el nombre del hospital es necesario').not().isEmpty(),
+        validarCampos
     ], actualizarHospital
 );
 
-router.delete('/:id', borrarHospital )
+router.delete('/:id', validarJWT, borrarHospital )
 
 module.exports = router;
